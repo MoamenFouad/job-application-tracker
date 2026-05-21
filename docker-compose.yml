@@ -1,0 +1,19 @@
+# Franco: da el docker compose bta3na - byes3hel el database el local
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: job_tracker_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: job_tracker
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
