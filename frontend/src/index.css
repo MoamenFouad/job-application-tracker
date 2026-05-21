@@ -1,0 +1,4 @@
+/* Franco: da el global CSS - tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
