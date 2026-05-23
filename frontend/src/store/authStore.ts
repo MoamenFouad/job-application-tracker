@@ -1,29 +1,25 @@
-// الـ store bta3 el auth - el user w el token mahdoodeen hena
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { User } from '../types';
+import { create } from 'zustand'
+import { TOKEN_KEY } from '../services/api'
+import type { User } from '../types'
 
 interface AuthState {
-  user: User | null;
-  token: string | null;
-  setAuth: (user: User, token: string) => void;
-  clearAuth: () => void;
+  user: User | null
+  token: string | null
+  isAuthenticated: boolean
+  setAuth: (user: User, token: string) => void
+  clearAuth: () => void
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      user: null,
-      token: null,
-      setAuth: (user, token) => {
-        localStorage.setItem('token', token);
-        set({ user, token });
-      },
-      clearAuth: () => {
-        localStorage.removeItem('token');
-        set({ user: null, token: null });
-      },
-    }),
-    { name: 'auth-storage' }
-  )
-);
+export const useAuthStore = create<AuthState>((set) => ({
+  user: null,
+  token: localStorage.getItem(TOKEN_KEY),
+  isAuthenticated: !!localStorage.getItem(TOKEN_KEY),
+  setAuth: (user, token) => {
+    localStorage.setItem(TOKEN_KEY, token)
+    set({ user, token, isAuthenticated: true })
+  },
+  clearAuth: () => {
+    localStorage.removeItem(TOKEN_KEY)
+    set({ user: null, token: null, isAuthenticated: false })
+  },
+}))

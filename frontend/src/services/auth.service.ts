@@ -1,27 +1,18 @@
-// Franco: da el auth service - hena bne3mel el API calls bta3et el auth
-import api from './api';
-import type { User, ApiResponse } from '../types';
+import { get, post } from './api'
+import type { User, LoginInput, RegisterInput, ApiResponse } from '../types'
 
-export interface LoginInput {
-  email: string;
-  password: string;
+interface AuthData {
+  user: User
+  token: string
 }
 
-export interface RegisterInput extends LoginInput {
-  name: string;
-}
+export const login = (data: LoginInput) =>
+  post<ApiResponse<AuthData>>('/auth/login', data).then((r) => r.data)
 
-export interface AuthResponse {
-  user: User;
-  token: string;
-}
+export const register = (data: RegisterInput) =>
+  post<ApiResponse<AuthData>>('/auth/register', data).then((r) => r.data)
 
-export const loginUser = async (input: LoginInput): Promise<AuthResponse> => {
-  const { data } = await api.post<ApiResponse<AuthResponse>>('/auth/login', input);
-  return data.data!;
-};
+export const getProfile = () =>
+  get<ApiResponse<User>>('/auth/profile').then((r) => r.data)
 
-export const registerUser = async (input: RegisterInput): Promise<AuthResponse> => {
-  const { data } = await api.post<ApiResponse<AuthResponse>>('/auth/register', input);
-  return data.data!;
-};
+export const logout = () => post<ApiResponse<null>>('/auth/logout')
