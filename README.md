@@ -109,3 +109,27 @@ cd frontend
 npm install
 npm run dev    # starts on :5173
 ```
+
+## Getting Started (Full Stack)
+
+1. **Start PostgreSQL** (Docker or local)
+
+2. **Backend**
+
+   ```bash
+   cd backend
+   cp .env.example .env
+   npm install
+   npm run db:migrate
+   npm run dev            # http://localhost:3001
+   ```
+
+3. **Frontend** (in a separate terminal)
+
+   ```bash
+   cd frontend
+   npm install
+   npm run dev            # http://localhost:5173
+   ```
+
+4. Open [http://localhost:5173](http://localhost:5173) — register an account and start tracking.
