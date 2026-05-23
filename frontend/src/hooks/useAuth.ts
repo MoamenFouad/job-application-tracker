@@ -14,7 +14,7 @@ export function useAuth() {
 
   const loginMutation = useMutation({
     mutationFn: (data: LoginInput) => authService.login(data),
-    onSuccess: (result) => {
+    onSuccess: (result: { user: import('../types').User; token: string }) => {
       setAuth(result.user, result.token)
       navigate('/dashboard')
     },
@@ -26,7 +26,7 @@ export function useAuth() {
 
   const registerMutation = useMutation({
     mutationFn: (data: RegisterInput) => authService.register(data),
-    onSuccess: (result) => {
+    onSuccess: (result: { user: import('../types').User; token: string }) => {
       setAuth(result.user, result.token)
       navigate('/dashboard')
     },

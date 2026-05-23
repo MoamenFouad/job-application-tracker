@@ -3,7 +3,7 @@ import axios from 'axios'
 const TOKEN_KEY = 'jat_token'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001/api',
+  baseURL: (import.meta as unknown as { env: Record<string, string> }).env.VITE_API_URL || 'http://localhost:3001/api',
   headers: { 'Content-Type': 'application/json' },
 })
 

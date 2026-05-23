@@ -29,7 +29,7 @@ export default function Dashboard() {
     )
   }
 
-  const recentJobs = recentData?.data ?? []
+  const recentJobs: import('../types').Job[] = recentData?.data ?? []
 
   return (
     <div className="fade-in space-y-8">

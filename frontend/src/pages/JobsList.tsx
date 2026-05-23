@@ -21,7 +21,7 @@ export default function JobsList() {
   const { data, isLoading } = useJobs(filters)
   const deleteMutation = useDeleteJob()
 
-  const jobs = data?.data ?? []
+  const jobs: import('../types').Job[] = data?.data ?? []
   const total = data?.pagination?.total ?? data?.total ?? 0
   const page = data?.pagination?.page ?? data?.page ?? 1
   const totalPages = data?.pagination?.totalPages ?? data?.totalPages ?? 1

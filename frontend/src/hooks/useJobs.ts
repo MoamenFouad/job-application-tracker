@@ -44,7 +44,7 @@ export function useUpdateJob() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateJobInput }) =>
       jobsService.updateJob(id, data),
-    onSuccess: (updated) => {
+    onSuccess: (updated: import('../types').Job) => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] })
       queryClient.setQueryData(['job', updated.id], updated)
       addToast('Job updated successfully!', 'success')
