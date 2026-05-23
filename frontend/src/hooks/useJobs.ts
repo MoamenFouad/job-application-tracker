@@ -1,35 +1,67 @@
-// Franco: da el useJobs hook - React Query hook byes3edna ngeeb el jobs
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchJobs, createJob, updateJob, deleteJob } from '../services/jobs.service';
-import type { CreateJobInput, UpdateJobInput } from '../types';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import * as jobsService from '../services/jobs.service'
+import { useToast } from './useToast'
+import type { JobStatus, CreateJobInput, UpdateJobInput } from '../types'
 
-export const useJobs = () => {
+interface JobsFilters {
+  status?: JobStatus
+  search?: string
+  page?: number
+  limit?: number
+}
+
+export function useJobs(filters?: JobsFilters) {
   return useQuery({
-    queryKey: ['jobs'],
-    queryFn: fetchJobs,
-  });
-};
+    queryKey: ['jobs', filters],
+    queryFn: () => jobsService.getJobs(filters),
+  })
+}
 
-export const useCreateJob = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (input: CreateJobInput) => createJob(input),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['jobs'] }),
-  });
-};
+export function useJob(id: string) {
+  return useQuery({
+    queryKey: ['job', id],
+    queryFn: () => jobsService.getJobById(id),
+    enabled: !!id,
+  })
+}
 
-export const useUpdateJob = () => {
-  const queryClient = useQueryClient();
+export function useCreateJob() {
+  const queryClient = useQueryClient()
+  const { addToast } = useToast()
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: UpdateJobInput }) => updateJob(id, input),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['jobs'] }),
-  });
-};
+    mutationFn: (data: CreateJobInput) => jobsService.createJob(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] })
+      addToast('Job added successfully!', 'success')
+    },
+    onError: () => addToast('Failed to create job.', 'error'),
+  })
+}
 
-export const useDeleteJob = () => {
-  const queryClient = useQueryClient();
+export function useUpdateJob() {
+  const queryClient = useQueryClient()
+  const { addToast } = useToast()
   return useMutation({
-    mutationFn: (id: string) => deleteJob(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['jobs'] }),
-  });
-};
+    mutationFn: ({ id, data }: { id: string; data: UpdateJobInput }) =>
+      jobsService.updateJob(id, data),
+    onSuccess: (updated) => {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] })
+      queryClient.setQueryData(['job', updated.id], updated)
+      addToast('Job updated successfully!', 'success')
+    },
+    onError: () => addToast('Failed to update job.', 'error'),
+  })
+}
+
+export function useDeleteJob() {
+  const queryClient = useQueryClient()
+  const { addToast } = useToast()
+  return useMutation({
+    mutationFn: (id: string) => jobsService.deleteJob(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] })
+      addToast('Job deleted.', 'info')
+    },
+    onError: () => addToast('Failed to delete job.', 'error'),
+  })
+}
