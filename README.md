@@ -1,93 +1,111 @@
-# Job Application Tracker - متابعة التقديمات 🎯
-<!-- Franco: da el project bta3 el job applications - yesa3dak tetab3 el wazaef ely ba3tatelhom -->
+# Job Application Tracker
 
-## Description
-A full-stack web application to track your job applications, manage interviews, and monitor your job search progress — all in one place.
+A full-stack web application to track your job applications, manage interviews, and monitor your job search progress.
 
 ## Tech Stack
-| Layer | Technology |
-|-------|-----------|
-| Backend | Node.js + Express + TypeScript |
-| Database | PostgreSQL + Prisma ORM |
+
+| Layer    | Technology                              |
+|----------|-----------------------------------------|
+| Backend  | Node.js + Express + TypeScript          |
+| Database | PostgreSQL + Prisma ORM                 |
 | Frontend | React + TypeScript + Vite + TailwindCSS |
-| Auth | JWT (JSON Web Tokens) |
-| Testing | Jest (backend) + Vitest (frontend) |
-| State | Zustand + TanStack React Query |
+| Auth     | JWT (JSON Web Tokens)                   |
+| Testing  | Jest (backend) + Vitest (frontend)      |
+| State    | Zustand + TanStack React Query          |
 
 ## Folder Structure
-```
+
+```text
 job-application-tracker/
-├── backend/                  # Express API server
+├── backend/
 │   ├── src/
 │   │   ├── controllers/      # Request handlers
 │   │   ├── routes/           # API route definitions
-│   │   ├── middleware/        # Auth & error middleware
-│   │   ├── services/         # Business logic layer
-│   │   ├── models/           # Type models
-│   │   └── utils/            # JWT & password helpers
-│   ├── prisma/               # Database schema & migrations
-│   └── tests/                # Jest test files
-├── frontend/                 # React SPA
-│   ├── src/
-│   │   ├── components/       # Reusable UI components
-│   │   ├── pages/            # Page-level components
-│   │   ├── hooks/            # Custom React hooks
-│   │   ├── services/         # Axios API calls
-│   │   ├── store/            # Zustand state stores
-│   │   └── types/            # TypeScript interfaces
-└── docker-compose.yml        # Local dev PostgreSQL
+│   │   ├── middleware/       # Auth & error middleware
+│   │   ├── services/         # Business logic
+│   │   ├── lib/              # Prisma singleton
+│   │   ├── utils/            # JWT, password, response, validation, logger
+│   │   └── types/            # Express type extensions
+│   ├── prisma/               # Schema, migrations, seed
+│   └── tests/                # Jest unit tests
+└── frontend/
+    └── src/
+        ├── components/       # Reusable UI components
+        ├── pages/            # Page-level components
+        ├── hooks/            # Custom React hooks
+        ├── services/         # Axios API calls
+        ├── store/            # Zustand state stores
+        └── types/            # TypeScript interfaces
 ```
 
-## Setup Instructions
+## Backend Setup
 
 ### Prerequisites
+
 - Node.js 18+
-- Docker & Docker Compose
-- npm or yarn
+- PostgreSQL (or Docker)
 
-### 1. Clone & Install
-```bash
-git clone https://github.com/MoamenFouad/job-application-tracker.git
-cd job-application-tracker
-```
+### Steps
 
-### 2. Start the Database
-```bash
-docker-compose up -d
-```
-
-### 3. Backend Setup
 ```bash
 cd backend
-cp .env.example .env
-# Edit .env with your values
+cp .env.example .env    # then edit values if needed
 npm install
-npx prisma migrate dev
-npm run dev
+npx prisma migrate dev  # creates the database tables
+npm run db:seed         # optional: seed demo data
+npm run dev             # starts server on :3001
 ```
 
-### 4. Frontend Setup
+### Environment Variables
+
+| Variable       | Description               |
+|----------------|---------------------------|
+| DATABASE_URL   | PostgreSQL connection URL |
+| JWT_SECRET     | Token signing secret      |
+| JWT_EXPIRES_IN | Token lifetime (e.g. 7d)  |
+| PORT           | HTTP port (default 3001)  |
+| NODE_ENV       | Environment name          |
+
+### npm Scripts
+
+| Script               | Description                       |
+|----------------------|-----------------------------------|
+| `npm run dev`        | Start dev server with nodemon     |
+| `npm run build`      | Compile TypeScript to `dist/`     |
+| `npm start`          | Run compiled production build     |
+| `npm test`           | Run Jest unit tests               |
+| `npm run db:migrate` | Run Prisma migrations             |
+| `npm run db:studio`  | Open Prisma Studio UI             |
+| `npm run db:seed`    | Seed demo user + sample jobs      |
+
+## API Endpoints
+
+| Method | Route               | Auth | Description                          |
+|--------|---------------------|------|--------------------------------------|
+| POST   | /api/auth/register  | No   | Create account                       |
+| POST   | /api/auth/login     | No   | Login and receive JWT                |
+| GET    | /api/auth/profile   | Yes  | Get current user profile             |
+| POST   | /api/auth/logout    | Yes  | Logout (client discards token)       |
+| GET    | /api/jobs           | Yes  | List jobs (paginated, filterable)    |
+| POST   | /api/jobs           | Yes  | Create a new job entry               |
+| GET    | /api/jobs/stats     | Yes  | Job counts grouped by status         |
+| GET    | /api/jobs/:id       | Yes  | Get a single job                     |
+| PUT    | /api/jobs/:id       | Yes  | Update a job                         |
+| DELETE | /api/jobs/:id       | Yes  | Delete a job                         |
+| GET    | /api/stats          | Yes  | Dashboard stats                      |
+| GET    | /api/stats/timeline | Yes  | Applications grouped by month (6 mo) |
+| GET    | /health             | No   | Health check                         |
+
+Query params for `GET /api/jobs`: `?status=APPLIED&search=google&page=1&limit=10`
+
+## Job Status Flow
+
+`WISHLIST` → `APPLIED` → `INTERVIEW` → `OFFER` or `REJECTED`
+
+## Frontend Setup
+
 ```bash
 cd frontend
 npm install
-npm run dev
+npm run dev    # starts on :5173
 ```
-
-### 5. Access the App
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:3001
-
-## API Endpoints
-| Method | Route | Description |
-|--------|-------|-------------|
-| POST | /api/auth/register | Register new user |
-| POST | /api/auth/login | Login & get JWT |
-| GET | /api/jobs | List all jobs |
-| POST | /api/jobs | Create new job |
-| GET | /api/jobs/:id | Get job detail |
-| PUT | /api/jobs/:id | Update job |
-| DELETE | /api/jobs/:id | Delete job |
-| GET | /api/stats | Get status summary |
-
-## Job Status Flow
-`WISHLIST` → `APPLIED` → `INTERVIEW` → `OFFER` or `REJECTED`
