@@ -1,21 +1,23 @@
-// Franco: da el Layout - byeleff el Navbar w el Sidebar w el children
-import Navbar from './Navbar';
-import Sidebar from './Sidebar';
+import { Outlet } from 'react-router-dom'
+import Navbar from './Navbar'
+import Sidebar from './Sidebar'
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-const Layout = ({ children }: LayoutProps) => {
+export default function Layout() {
   return (
-    <div className="flex h-screen">
+    <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+      <Navbar />
       <Sidebar />
-      <div className="flex flex-col flex-1">
-        <Navbar />
-        <main className="flex-1 overflow-auto p-6">{children}</main>
-      </div>
+      <main
+        style={{
+          marginLeft: '220px',
+          paddingTop: '56px',
+          minHeight: '100vh',
+        }}
+      >
+        <div className="p-8">
+          <Outlet />
+        </div>
+      </main>
     </div>
-  );
-};
-
-export default Layout;
+  )
+}
