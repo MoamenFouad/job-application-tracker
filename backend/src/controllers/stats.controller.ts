@@ -1,6 +1,21 @@
-// ده الـ controller بتاع الـ stats - da el controller bta3 el stats (el summary)
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
+import { getStats, getTimeline } from '../services/jobs.service';
+import { successResponse } from '../utils/response.utils';
 
-export const getStats = async (req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'todo' });
+export const getDashboardStats = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const stats = await getStats(req.userId!);
+    successResponse(res, stats);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getApplicationTimeline = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const timeline = await getTimeline(req.userId!);
+    successResponse(res, timeline);
+  } catch (err) {
+    next(err);
+  }
 };
