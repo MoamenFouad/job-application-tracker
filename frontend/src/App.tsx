@@ -1,38 +1,54 @@
-// Franco: da el App.tsx - el router w el providers kolahom hena
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useAuthStore } from './store/authStore';
-import Layout from './components/layout/Layout';
-import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import JobsList from './pages/JobsList';
-import JobDetail from './pages/JobDetail';
-import AddJob from './pages/AddJob';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import ToastContainer from './components/ui/ToastContainer'
+import Layout from './components/layout/Layout'
+import ProtectedRoute from './components/layout/ProtectedRoute'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import Dashboard from './pages/Dashboard'
+import JobsList from './pages/JobsList'
+import AddJob from './pages/AddJob'
+import JobDetail from './pages/JobDetail'
+import EditJob from './pages/EditJob'
+import NotFound from './pages/NotFound'
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 1000 * 60 * 5,
+    },
+  },
+})
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const token = useAuthStore((state) => state.token);
-  if (!token) return <Navigate to="/login" replace />;
-  return <Layout>{children}</Layout>;
-};
-
-const App = () => {
+export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <ToastContainer />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/jobs" element={<ProtectedRoute><JobsList /></ProtectedRoute>} />
-          <Route path="/jobs/new" element={<ProtectedRoute><AddJob /></ProtectedRoute>} />
-          <Route path="/jobs/:id" element={<ProtectedRoute><JobDetail /></ProtectedRoute>} />
+
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="jobs" element={<JobsList />} />
+            <Route path="jobs/new" element={<AddJob />} />
+            <Route path="jobs/:id" element={<JobDetail />} />
+            <Route path="jobs/:id/edit" element={<EditJob />} />
+          </Route>
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
-  );
-};
-
-export default App;
+  )
+}
