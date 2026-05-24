@@ -132,4 +132,4 @@ npm run dev    # starts on :5173
    npm run dev            # http://localhost:5173
    ```
 
-4. Open [http://localhost:5173](http://localhost:5173) — register an account and start tracking.
+
